@@ -303,3 +303,99 @@ write.csv(optimisation_results,
           row.names = FALSE)
 
 cat("\nOptimisation results saved to data/\n")
+
+# ── ROUND 2: Extended dose range testing ─────────────────────
+
+cat("Round 2 — Extended dose testing...\n")
+
+# ARC — needs very high doses
+cat("Testing extended ARC regimens...\n")
+arc_6  <- simulate_regimen(n_patients, 150, 20,
+                           3000, 8, "ARC", "3000mg q8h")
+arc_7  <- simulate_regimen(n_patients, 150, 20,
+                           3500, 8, "ARC", "3500mg q8h")
+arc_8  <- simulate_regimen(n_patients, 150, 20,
+                           2500, 8, "ARC", "2500mg q8h")
+arc_9  <- simulate_regimen(n_patients, 150, 20,
+                           3000, 12, "ARC", "3000mg q12h")
+
+# Normal — intermediate doses
+cat("Testing extended Normal regimens...\n")
+nor_5  <- simulate_regimen(n_patients, 90, 15,
+                           1750, 12, "Normal", "1750mg q12h")
+nor_6  <- simulate_regimen(n_patients, 90, 15,
+                           2000, 8,  "Normal", "2000mg q8h")
+nor_7  <- simulate_regimen(n_patients, 90, 15,
+                           1750, 8,  "Normal", "1750mg q8h")
+
+# AKI — extended interval strategies
+cat("Testing extended AKI regimens...\n")
+aki_6  <- simulate_regimen(n_patients, 20, 5,
+                           1000, 24, "AKI", "1000mg q24h")
+aki_7  <- simulate_regimen(n_patients, 20, 5,
+                           1250, 24, "AKI", "1250mg q24h")
+aki_8  <- simulate_regimen(n_patients, 20, 5,
+                           1000, 36, "AKI", "1000mg q36h")
+aki_9  <- simulate_regimen(n_patients, 20, 5,
+                           750,  36, "AKI", "750mg q36h")
+
+# Combine with Round 1
+all_regimens_r2 <- bind_rows(
+  all_regimens,
+  arc_6, arc_7, arc_8, arc_9,
+  nor_5, nor_6, nor_7,
+  aki_6, aki_7, aki_8, aki_9
+)
+
+# Calculate PTA for all regimens
+optimisation_r2 <- all_regimens_r2 %>%
+  group_by(Stratum, Regimen, Dose, Interval) %>%
+  summarise(
+    N            = n(),
+    Mean_AUC     = round(mean(AUC_24), 1),
+    SD_AUC       = round(sd(AUC_24), 1),
+    PTA_target   = round(mean(AUC_24 >= 400 &
+                                AUC_24 <= 600) * 100, 1),
+    PTA_above600 = round(mean(AUC_24 > 600) * 100, 1),
+    PTA_below400 = round(mean(AUC_24 < 400) * 100, 1),
+    .groups = "drop"
+  ) %>%
+  arrange(Stratum, Interval, Dose)
+
+# Print Round 2 results
+cat("\n=== ROUND 2 RESULTS ===\n")
+
+cat("\n--- ARC ---\n")
+print(optimisation_r2 %>%
+        filter(Stratum == "ARC") %>%
+        select(Regimen, Mean_AUC, PTA_target,
+               PTA_above600, PTA_below400) %>%
+        arrange(desc(PTA_target)))
+
+cat("\n--- NORMAL ---\n")
+print(optimisation_r2 %>%
+        filter(Stratum == "Normal") %>%
+        select(Regimen, Mean_AUC, PTA_target,
+               PTA_above600, PTA_below400) %>%
+        arrange(desc(PTA_target)))
+
+cat("\n--- AKI ---\n")
+print(optimisation_r2 %>%
+        filter(Stratum == "AKI") %>%
+        select(Regimen, Mean_AUC, PTA_target,
+               PTA_above600, PTA_below400) %>%
+        arrange(desc(PTA_target)))
+
+# Optimal regimens
+cat("\n=== OPTIMAL REGIMENS (PTA >= 90%) ===\n")
+optimal_r2 <- optimisation_r2 %>%
+  filter(PTA_target >= 90) %>%
+  select(Stratum, Regimen, Mean_AUC,
+         PTA_target, PTA_above600, PTA_below400)
+print(optimal_r2)
+
+# Save
+write.csv(optimisation_r2,
+          "data/optimisation_r2.csv",
+          row.names = FALSE)
+cat("\nRound 2 results saved\n")
