@@ -1,7 +1,7 @@
 # ================================================
 # PROJECT: Vancomycin MIPD Monte Carlo Study
 # FILE:    02_covariate_model.R
-# AUTHOR:  Sivakumar Kalyana sundaram
+# AUTHOR:  Raksana Sivakumar
 # DATE:    June 2026
 # PURPOSE: Add renal function covariate to PK model
 #          Simulate ARC vs Normal vs AKI patients
