@@ -1,0 +1,4 @@
+"Stratum","N","Mean_CrCl","Mean_CL","Mean_AUC","SD_AUC","Mean_Trough","Mean_Peak","PTA_target","PTA_above_600","PTA_below_400"
+"AKI (CrCl ~20)",1000,20,1.37,807.6,165.8,49.5,78.2,8.9,90.8,0.3
+"ARC (CrCl ~150)",1000,149.5,6.99,231.6,66.8,8.6,36.3,1.9,0,98.1
+"Normal (CrCl ~90)",1000,89.7,4.64,342.7,98.7,16.4,44.4,23.2,1.6,75.2
