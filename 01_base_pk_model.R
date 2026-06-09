@@ -1,7 +1,7 @@
 # ================================================
 # PROJECT: Vancomycin MIPD Monte Carlo Study
 # FILE:    01_base_pk_model.R
-# AUTHOR:  Sivakumar Kalyana sundaram
+# AUTHOR:  Raksana Sivakumar
 # DATE:    June 2026
 # PURPOSE: Base one-compartment vancomycin PK model
 #          Simulates typical adult with normal renal
